@@ -30,6 +30,6 @@ class Tree(object):
  
      def run(self):
          while True:
-	     yield AllOf(env, self.incoming_events)
+	     yield simpy.events.AllOf(env, self.incoming_events)
 	     yield self.env.process(self.process_data())
              print('Processingat %d' % self.env.now)

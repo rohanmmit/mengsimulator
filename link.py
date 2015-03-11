@@ -1,4 +1,5 @@
 import simpy
+
 class Link(object):
   def __init__(self, env, delay, event):
         self.env = env
