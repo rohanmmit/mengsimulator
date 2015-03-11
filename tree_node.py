@@ -1,3 +1,4 @@
+import link
 import random
 import simpy
 
@@ -5,17 +6,6 @@ VECTOR_SIZE = 100 ## number of elements in vector
 VALUE_RANGE = 100.0 ## highest value range for element in vector
 LATENCY_RANGE = 100.0 ## range from zero for bottleneck link
 PROCESS_RANGE = 1.0 ## the process range
-
-class Link(object):
-  def __init__(self, env, delay, event):
-        self.env = env
-        self.delay = delay
-	self.event = event
-
-  def fire(self):
-       self.env.timeout(delay)
-       self.event.succeed()         
-
 
 class Tree(object):
      def __init__(self, env, incoming_events, outgoing_links):
@@ -43,8 +33,3 @@ class Tree(object):
 	     yield AllOf(env, self.incoming_events)
 	     yield self.env.process(self.process_data())
              print('Processingat %d' % self.env.now)
-
-
-env = simpy.Environment()
-tree = Tree(env)
-env.run(until=15)
