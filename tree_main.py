@@ -13,9 +13,9 @@ def construct_graph(filename):
         graph[node] = links
     return graph 
 
-def construct_link(env, event):
+def construct_link(env, event, node, outgoing_node):
    delay = 20
-   link = Link(env, delay, event)
+   link = Link(env, delay, event, node, outgoing_node)
    return link
 
 def construct_dicts(env, graph):
@@ -25,10 +25,10 @@ def construct_dicts(env, graph):
       outgoing_links = []
       for outgoing_node in outgoing_nodes:
 	  event = env.event()
-	  link = construct_link(env, event)
+	  link = construct_link(env, event, node, outgoing_node)
 	  outgoing_links.append(link)
 	  inner_events = inc_dict.get(outgoing_node,[])
-	  inner_events.append(outgoing_node)
+	  inner_events.append(event)
 	  inc_dict[outgoing_node] = inner_events
       out_dict[node] = outgoing_links
   return inc_dict, out_dict
@@ -37,9 +37,7 @@ def construct_tree_nodes(env, inc_dict, out_dict):
     for node in out_dict:
 	incoming_events = inc_dict.get(node, [])
 	outgoing_links =  out_dict.get(node)
-	print "env before", env
-	tree = Tree(env, incoming_events, outgoing_links)	
-	print "env after", env
+	tree = Tree(env, incoming_events, outgoing_links, node)	
     return
 graph = construct_graph("examples/tree1.txt")
 env = simpy.Environment()

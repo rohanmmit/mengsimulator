@@ -8,9 +8,10 @@ LATENCY_RANGE = 100.0 ## range from zero for bottleneck link
 PROCESS_RANGE = 1.0 ## the process range
 
 class Tree(object):
-     def __init__(self, env, incoming_events, outgoing_links):
+     def __init__(self, env, incoming_events, outgoing_links, id):
          self.env = env
 	 self.vector = []
+	 self.id = id
 	 for i in range(VECTOR_SIZE):
 	     random_value = random.random() * VALUE_RANGE
 	     self.vector.append(random_value)
@@ -21,15 +22,17 @@ class Tree(object):
  
      def process_data(self):
 	 process_time = random.random() * PROCESS_RANGE
-	 yield self.env.timeout(process_time)	 
+	 yield self.env.timeout(10)	 
      
-     def send_outgoing_links():
-	for link in self.links:
+     def send_outgoing_links(self):
+	for link in self.outgoing_links:
 	   link.fire()    	     
           
  
      def run(self):
          while True:
-	     yield simpy.events.AllOf(env, self.incoming_events)
+	     env = self.env
+	     yield env.all_of(self.incoming_events)
 	     yield self.env.process(self.process_data())
-             print('Processingat %d' % self.env.now)
+	     self.send_outgoing_links()
+	     print(self.id,' Processingat %d' % self.env.now)
