@@ -2,7 +2,7 @@ import simpy
 
 from link import *
 from tree_node import *
-
+from event_wrapper import *
 
 def construct_graph(filename):
     f = open(filename,"r")

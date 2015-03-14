@@ -27,12 +27,17 @@ class Tree(object):
      def send_outgoing_links(self):
 	for link in self.outgoing_links:
 	   link.fire()    	     
-          
- 
+         
+     def generate_events_list(self, event_wrapper_list):
+	events = []
+	for event_wrapper in self.incoming_events:	 
+ 	    events.append(event_wrapper.get())
+	return events
      def run(self):
          while True:
 	     env = self.env
-	     yield env.all_of(self.incoming_events)
+	     event_list = self.generate_events_list(self.incoming_events)
+	     yield env.all_of(event_list)
 	     yield self.env.process(self.process_data())
 	     self.send_outgoing_links()
 	     print(self.id,' Processingat %d' % self.env.now)
