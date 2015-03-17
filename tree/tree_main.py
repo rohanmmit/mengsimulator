@@ -1,20 +1,15 @@
+import random
 import simpy
 
 from link import *
 from tree_node import *
-from event_wrapper import *
 
-def construct_graph(filename):
-    f = open(filename,"r")
-    graph = dict()
-    for line in f:
-        values = line.split()
-        node, links = values[0], values[1:]
-        graph[node] = links
-    return graph 
+def get_delay():
+  return random.expovariate(lambd)
+
 
 def construct_link(env, event, node, outgoing_node):
-   delay = 20
+   delay = get_delay()
    link = Link(env, delay, event, node, outgoing_node)
    return link
 
@@ -39,8 +34,31 @@ def construct_tree_nodes(env, inc_dict, out_dict):
 	outgoing_links =  out_dict.get(node)
 	tree = Tree(env, incoming_events, outgoing_links, node)	
     return
-graph = construct_graph("examples/tree1.txt")
-env = simpy.Environment()
-inc_dict, out_dict = construct_dicts(env, graph)
-construct_tree_nodes(env, inc_dict, out_dict)
-env.run()
+
+def run_test(num_nodes):
+   graph = construct_graph("examples/tree1.txt")
+   env = simpy.Environment()
+   inc_dict, out_dict = construct_dicts(env, graph)
+   construct_tree_nodes(env, inc_dict, out_dict)
+   env.run()
+   return env.now()
+
+def run_multiple_tests(num_nodes):
+    average_time = 0.0
+    num_samples = 10
+    for i in range(num_samples):
+       time = run_test(num_nodes)
+       average_time = (average_time * i + time)/(i+1)
+    return average_time
+
+def run():
+   num_nodes_list = [10, 100, 1000, 10000, 100000,1000000 ]
+   times_list = []
+   for num_nodes in num_nodes_list:
+      average_time = run_multiple_tests(num_nodes) 
+      times_list.append(average_time) 
+   print times_list
+   plt.plot(num_nodes_list, times_list)
+run()
+
+
