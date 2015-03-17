@@ -68,27 +68,26 @@ def run_test(num_nodes):
     current_time = 0.0
     event_processing = []
     while not isFinished(node_dict, mean):
-       print node_dict 
        match_nodes(available_nodes, event_processing, current_time)
        new_time, match = heappop(event_processing)     
        current_time = new_time
        process_match(match, node_dict, available_nodes)
-    print current_time
     return current_time
 
 def run_multiple_tests(num_nodes):
     average_time = 0.0
-    for i in range(num_nodes):
+    num_samples = 10
+    for i in range(num_samples):
        time = run_test(num_nodes)
        average_time = (average_time * i + time)/(i+1)
     return average_time
 
 def run():
-   num_nodes_list = [10, 100, 1000, 10000]
+   num_nodes_list = [10, 100, 1000, 10000, 100000,1000000 ]
    times_list = []
    for num_nodes in num_nodes_list:
       average_time = run_multiple_tests(num_nodes) 
       times_list.append(average_time) 
+   print times_list
    plt.plot(num_nodes_list, times_list)
-result = run_test(10)
-
+run()
