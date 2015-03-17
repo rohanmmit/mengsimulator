@@ -5,9 +5,9 @@ from link import *
 from tree_node import *
 
 lambd = 1
+
 def get_delay():
   return random.expovariate(lambd)
-
 
 def construct_link(env, event, node, outgoing_node):
    delay = get_delay()
@@ -54,7 +54,6 @@ def construct_tree_nodes(env, inc_dict_a,inc_dict_b, out_dict_a, out_dict_b):
         incoming_events_b = inc_dict_b.get(node, [])
 	outgoing_links_b =  out_dict_b.get(node,[])
 	tree = Tree(env, incoming_events_a,incoming_events_b, outgoing_links_a,outgoing_links_b, node)	
-    return
 
 def run_test(num_nodes):
    graph = construct_graph(num_nodes)
@@ -63,6 +62,7 @@ def run_test(num_nodes):
    construct_tree_nodes(env, inc_dict_a,inc_dict_b, out_dict_a, out_dict_b)
    env.run()
    return env.now
+
 def run_multiple_tests(num_nodes):
     average_time = 0.0
     num_samples = 100
@@ -81,6 +81,5 @@ def run():
    plt.plot(num_nodes_list, times_list, 'ro')
    plt.ylabel('time')
    plt.xlabel('num nodes')
-
    plt.show()
 run()
