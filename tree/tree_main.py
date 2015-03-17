@@ -4,6 +4,7 @@ import simpy
 from link import *
 from tree_node import *
 
+lambd = 1
 def get_delay():
   return random.expovariate(lambd)
 
@@ -13,33 +14,52 @@ def construct_link(env, event, node, outgoing_node):
    link = Link(env, delay, event, node, outgoing_node)
    return link
 
+def construct_graph(num_nodes):
+ graph = dict()
+ for i in range(num_nodes,1,-1): 
+    graph[i] = [i/2]
+ graph[1] = []
+ return graph
 def construct_dicts(env, graph):
-  inc_dict = dict()
-  out_dict = dict()
+  inc_dict_a = dict()
+  inc_dict_b = dict()
+  out_dict_a = dict()
+  out_dict_b = dict()
   for node,outgoing_nodes in graph.iteritems():
-      outgoing_links = []
+      outgoing_links_a = []
+      incoming_events_b = []
       for outgoing_node in outgoing_nodes:
-	  event = env.event()
-	  link = construct_link(env, event, node, outgoing_node)
-	  outgoing_links.append(link)
-	  inner_events = inc_dict.get(outgoing_node,[])
-	  inner_events.append(event)
-	  inc_dict[outgoing_node] = inner_events
-      out_dict[node] = outgoing_links
-  return inc_dict, out_dict
+          delay = get_delay()
+	  event_a = env.event()
+	  event_b = env.event()
+	  link_a = Link(env, delay,event_a, node, outgoing_node)
+	  link_b = Link(env, delay,event_b, node, outgoing_node)
+	  outgoing_links_a.append(link)
+	  incoming_events_b.append(event2)
+	  inc_events_a = inc_dict_a.get(outgoing_node,[])
+	  inc_events.append(event_a)
+	  inc_dict[outgoing_node] = inc_events_a
+          outer_events_b = out_dict_b.get(outgoing_node,[])
+	  outer_events_b.append(link_b)
+	  out_dict_b[outgoing_node] = outer_events_b
+      out_dict_a[node] = outgoing_links
+      inc_dict_b[node] = incoming_events_b
+  return inc_dict_a,inc_dict_b, out_dict_a, out_dict_b
 	    
-def construct_tree_nodes(env, inc_dict, out_dict):    
+def construct_tree_nodes(env, inc_dict_a,inc_dict_b, out_dict_a, out_dict_b):    
     for node in out_dict:
-	incoming_events = inc_dict.get(node, [])
-	outgoing_links =  out_dict.get(node)
-	tree = Tree(env, incoming_events, outgoing_links, node)	
+	incoming_events_a = inc_dict_a.get(node, [])
+	outgoing_links_a =  out_dict_a.get(node,[])
+        incoming_events_b = inc_dict_b.get(node, [])
+	outgoing_links_b =  out_dict_b.get(node,[])
+	tree = Tree(env, incoming_events_a,incoming_events_b, outgoing_links_a,outgoing_links_b, node)	
     return
 
 def run_test(num_nodes):
-   graph = construct_graph("examples/tree1.txt")
+   graph = construct_graph(num_nodes)
    env = simpy.Environment()
-   inc_dict, out_dict = construct_dicts(env, graph)
-   construct_tree_nodes(env, inc_dict, out_dict)
+   inc_dict_a,inc_dict_b,  out_dict_a, out_dict_b = construct_dicts(env, graph)
+   construct_tree_nodes(env, inc_dict_a,inc_dict_b, out_dict_a, out_dict_b)
    env.run()
    return env.now()
 
@@ -59,6 +79,6 @@ def run():
       times_list.append(average_time) 
    print times_list
    plt.plot(num_nodes_list, times_list)
-run()
-
+result = construct_graph(3)
+print result
 
