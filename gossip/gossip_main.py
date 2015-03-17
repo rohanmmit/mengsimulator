@@ -76,18 +76,22 @@ def run_test(num_nodes):
 
 def run_multiple_tests(num_nodes):
     average_time = 0.0
-    num_samples = 10
+    num_samples = 100
     for i in range(num_samples):
        time = run_test(num_nodes)
        average_time = (average_time * i + time)/(i+1)
+    print average_time
     return average_time
 
 def run():
-   num_nodes_list = [10, 100, 1000, 10000, 100000,1000000 ]
+   num_nodes_list = [3, 7, 15, 31, 63,127,255,511,1023,2047,4095,8191]
    times_list = []
    for num_nodes in num_nodes_list:
       average_time = run_multiple_tests(num_nodes) 
       times_list.append(average_time) 
    print times_list
    plt.plot(num_nodes_list, times_list)
+   plt.ylabel('time')
+   plt.xlabel('num nodes')
+   plt.show()
 run()
