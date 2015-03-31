@@ -1,6 +1,7 @@
 import math
 import random
 import matplotlib.pyplot as plt
+import numpy
 from heapq import heappush, heappop
 from node import *
 from match import *
@@ -19,8 +20,13 @@ def isFinished(dic, mean):
        return False
   return True
 
-def get_delay():
-  return 2 * random.expovariate(lambd)
+
+def get_pareto_delay():
+   s = numpy.random.pareto(2, 1)
+   return 2 * s[0] 
+
+def get_exponential_delay():
+  return random.expovariate(lambd) + random.expovariate(lambd)
 
 def setup(num_nodes):
   available_nodes = []
@@ -61,7 +67,7 @@ def match_nodes(available_nodes, event_processing, current_time):
           if temp_node_id != past_id:
              available_nodes.pop(j)
              available_nodes.pop(i)
-             random_delay = get_delay() + current_time
+             random_delay = get_exponential_delay() + current_time
              new_match = Match(current_node, temp_node)
 	     heappush(event_processing, (random_delay,new_match))        
              i = i -1
@@ -89,8 +95,7 @@ def run_multiple_tests(num_nodes):
 
 def run():
    
-   num_nodes_lit = [3, 7, 15, 31, 63,127,255,511,1023,2047,4095,8191]
-   num_nodes_list = [127]
+   num_nodes_list = [3, 7, 15, 31, 63,127,255,511,1023,2047,4095,8191]
    times_list = []
    for num_nodes in num_nodes_list:
       average_time = run_multiple_tests(num_nodes) 
@@ -100,4 +105,4 @@ def run():
    plt.ylabel('time')
    plt.xlabel('num nodes')
    plt.show()
-run_multiple_tests(511)
+run()
