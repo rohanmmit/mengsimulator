@@ -24,25 +24,21 @@ def get_delay():
 
 def setup(num_nodes):
   available_nodes = []
-  node_dict = dict()
   unfinished_nodes = dict()
   mean = 0.0
   for i in range(num_nodes): 
     value = random.random()
-    node_dict[i] = value
     unfinished_nodes[i] = 0
     node = Node(value,i, None)
     available_nodes.append(node)
     mean = (mean * i + value)/(i + 1)
-  return available_nodes, node_dict,unfinished_nodes, mean 
+  return available_nodes, unfinished_nodes, mean 
 
-def process_match(match, node_dict, available_nodes, unfinished_nodes, mean):
+def process_match(match, available_nodes, unfinished_nodes, mean):
    node1, node2 = match.get_nodes()
    node1_id, _, node1_value = node1.get_info()
    node2_id, _, node2_value = node2.get_info()
    average = (node1_value + node2_value) / 2
-   node_dict[node1_id] = average
-   node_dict[node2_id] = average
    node1 = Node(average, node1_id, node2_id)
    node2 = Node(average, node2_id, node1_id)
    if is_close(average, mean):
@@ -72,14 +68,14 @@ def match_nodes(available_nodes, event_processing, current_time):
              break 
        i = i + 1     
 def run_test(num_nodes):
-    available_nodes, node_dict, unfinished_nodes, mean = setup(num_nodes)
+    available_nodes, unfinished_nodes, mean = setup(num_nodes)
     current_time = 0.0
     event_processing = []
     while len(unfinished_nodes) != 0:
        match_nodes(available_nodes, event_processing, current_time)
        new_time, match = heappop(event_processing)     
        current_time = new_time
-       process_match(match, node_dict, available_nodes, unfinished_nodes, mean)
+       process_match(match,  available_nodes, unfinished_nodes, mean)
     return current_time
 
 def run_multiple_tests(num_nodes):
