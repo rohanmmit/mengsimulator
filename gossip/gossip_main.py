@@ -9,8 +9,8 @@ error_cutoff = 0.05
 lambd = 1
 
 def is_close(vector, mean_vector):
-  mean_sum = numpy.sum(mean_vector)
-  diff = numpy.linalg.norm(vector-mean_vector, 1) 
+  mean_sum = numpy.linalg.norm(mean_vector, 2) 
+  diff = numpy.linalg.norm(vector-mean_vector, 2)
   if diff < error_cutoff * mean_sum:
       return True
   return False
@@ -25,7 +25,7 @@ def get_exponential_delay():
 def setup(num_nodes):
   available_nodes = []
   unfinished_nodes = dict()
-  vector_size = 100
+  vector_size = 1
   mean_vector = [0.0] * vector_size
   for i in range(num_nodes):
     node_vector = []
