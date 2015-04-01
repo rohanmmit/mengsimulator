@@ -8,46 +8,46 @@ from match import *
 error_cutoff = 0.05
 lambd = 1
 
-def is_close(value, mean):
-  diff = abs(value - mean)
-  if diff < error_cutoff * mean:
+def is_close(vector, mean_vector):
+  mean_sum = numpy.sum(mean_vector)
+  diff = numpy.linalg.norm(vector-mean_vector, 1) 
+  if diff < error_cutoff * mean_sum:
       return True
   return False
 
-def isFinished(dic, mean):
-  for _, value in dic.iteritems():
-     if not is_close(value, mean): 
-       return False
-  return True
-
-
 def get_pareto_delay():
-   s = numpy.random.pareto(2, 1)
-   return 2 * s[0] 
+   s = numpy.random.pareto(5, 2)
+   return (s[0] + s[1]) 
 
 def get_exponential_delay():
-  return random.expovariate(lambd) + random.expovariate(lambd)
+  return random.expovariate(lambd) * 2
 
 def setup(num_nodes):
   available_nodes = []
   unfinished_nodes = dict()
-  mean = 0.0
-  for i in range(num_nodes): 
-    value = random.random()
+  vector_size = 100
+  mean_vector = [0.0] * vector_size
+  for i in range(num_nodes):
+    node_vector = []
     unfinished_nodes[i] = 0
-    node = Node(value,i, None)
+    for j in range(vector_size): 
+      value = random.random()
+      node_vector.append(value)
+      mean_vector[j] = (mean_vector[j] * i + value)/(i + 1)
+    np_array = numpy.array(node_vector)
+    node = Node(np_array,i, None)
     available_nodes.append(node)
-    mean = (mean * i + value)/(i + 1)
-  return available_nodes, unfinished_nodes, mean 
+  wrapped_mean_vector = numpy.array(mean_vector)
+  return available_nodes, unfinished_nodes, wrapped_mean_vector
 
-def process_match(match, available_nodes, unfinished_nodes, mean):
+def process_match(match, available_nodes, unfinished_nodes, mean_vector):
    node1, node2 = match.get_nodes()
-   node1_id, _, node1_value = node1.get_info()
-   node2_id, _, node2_value = node2.get_info()
-   average = (node1_value + node2_value) / 2
-   node1 = Node(average, node1_id, node2_id)
-   node2 = Node(average, node2_id, node1_id)
-   if is_close(average, mean):
+   node1_id, _, node1_vector = node1.get_info()
+   node2_id, _, node2_vector = node2.get_info()
+   new_vector = (node1_vector + node2_vector) / 2
+   node1 = Node(new_vector, node1_id, node2_id)
+   node2 = Node(new_vector, node2_id, node1_id)
+   if is_close(new_vector, mean_vector):
 	unfinished_nodes.pop(node1_id, None)
 	unfinished_nodes.pop(node2_id, None)
    else :
