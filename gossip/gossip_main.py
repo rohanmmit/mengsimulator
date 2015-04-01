@@ -25,7 +25,7 @@ def get_exponential_delay():
 def setup(num_nodes):
   available_nodes = []
   unfinished_nodes = dict()
-  vector_size = 1
+  vector_size = 1000
   mean_vector = [0.0] * vector_size
   for i in range(num_nodes):
     node_vector = []
@@ -56,29 +56,34 @@ def process_match(match, available_nodes, unfinished_nodes, mean_vector):
    available_nodes.append(node1)  
    available_nodes.append(node2)  
 
-def match_nodes(available_nodes, event_processing, current_time):
+def match_nodes(available_nodes, event_processing, current_time, limit):
+    if len(available_nodes) < limit:
+       return
     i = 0
-    while i < len(available_nodes):
+    while i < len(available_nodes) - 1:
        current_node = available_nodes[i]
-       _,past_id, _ = current_node.get_info()
+       _,_, vector = current_node.get_info()
+       max_index = i + 1
+       max_difference = -1
        for j in range(i+1, len(available_nodes)):
           temp_node = available_nodes[j]
-          temp_node_id, _,_ = temp_node.get_info()
-          if temp_node_id != past_id:
-             available_nodes.pop(j)
-             available_nodes.pop(i)
-             random_delay = get_exponential_delay() + current_time
-             new_match = Match(current_node, temp_node)
-	     heappush(event_processing, (random_delay,new_match))        
-             i = i -1
-             break 
-       i = i + 1     
+          temp_node_vector, _,_ = temp_node.get_info()
+          diff = numpy.linalg.norm(vector-temp_node_vector, 2)
+	  if diff > max_difference:
+             max_difference = diff
+	     max_index = j  
+       temp_node = available_nodes.pop(max_index)
+       available_nodes.pop(i)
+       random_delay = get_exponential_delay() + current_time
+       new_match = Match(current_node, temp_node)
+       heappush(event_processing, (random_delay,new_match))        
 def run_test(num_nodes):
     available_nodes, unfinished_nodes, mean = setup(num_nodes)
     current_time = 0.0
     event_processing = []
+    limit = math.floor(num_nodes * 0.1)
     while len(unfinished_nodes) != 0:
-       match_nodes(available_nodes, event_processing, current_time)
+       match_nodes(available_nodes, event_processing, current_time, limit)
        new_time, match = heappop(event_processing)     
        current_time = new_time
        process_match(match,  available_nodes, unfinished_nodes, mean)
