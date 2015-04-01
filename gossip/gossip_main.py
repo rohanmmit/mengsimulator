@@ -67,8 +67,8 @@ def match_nodes(available_nodes, event_processing, current_time, limit):
        max_difference = -1
        for j in range(i+1, len(available_nodes)):
           temp_node = available_nodes[j]
-          temp_node_vector, _,_ = temp_node.get_info()
-          diff = numpy.linalg.norm(vector-temp_node_vector, 2)
+          _, _,temp_node_vector = temp_node.get_info()
+	  diff = numpy.linalg.norm(vector-temp_node_vector, 2)
 	  if diff > max_difference:
              max_difference = diff
 	     max_index = j  
